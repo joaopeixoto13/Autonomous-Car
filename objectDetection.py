@@ -4,9 +4,9 @@ import numpy as np
 
 WIDTH = 640
 HEIGHT = 480
-BLOCK_NUMBER = 25000
+BLOCK_NUMBER = 8000
 BLOCK_X_TH = WIDTH//2
-BLOCK_Y_TH = HEIGHT//2.5
+BLOCK_Y_TH = HEIGHT//3
 BLOCK_X_TH_TH = 80
 
 def drawHist(img, flag):
@@ -33,18 +33,15 @@ def filterBlock(img):
     mask = cv.bitwise_and(img, img, mask=mask)
     return mask
 
-block = cv.imread("Projeto/data/block2.png")
-block = cv.resize(block, (WIDTH,HEIGHT))
-cv.imshow("block1", block)
-block = filterBlock(block)
-gray_block = cv.cvtColor(block, cv.COLOR_BGR2GRAY)
-_, gray_block = cv.threshold(gray_block, 50, 255, cv.THRESH_BINARY)
-pos = np.nonzero(gray_block)
-print(len(pos[0]))
-print(pos)
+def obstacleDetection(img):
+    block = cv.resize(img, (WIDTH,HEIGHT))
+    block = filterBlock(block)
+    gray_block = cv.cvtColor(block, cv.COLOR_BGR2GRAY)
+    _, gray_block = cv.threshold(gray_block, 50, 255, cv.THRESH_BINARY)
+    pos = np.nonzero(gray_block)
 
-if len(pos[0]) > BLOCK_NUMBER and pos[0][-1] >= BLOCK_Y_TH and math.fabs(pos[1][(len(pos[1])-1) //2] - BLOCK_X_TH) < BLOCK_X_TH_TH:
-    print("Block detected")
-
-cv.imshow("block", gray_block)
-cv.waitKey(0)
+    print(len(pos[0]))
+    if len(pos[0]) > BLOCK_NUMBER and pos[0][-1] >= BLOCK_Y_TH and math.fabs(pos[1][(len(pos[1])-1) //2] - BLOCK_X_TH) < BLOCK_X_TH_TH:
+        return 1
+    else:
+        return 0
