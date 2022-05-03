@@ -23,9 +23,7 @@ def drawLines(img, center, start_angle, end_angle):
     for i in range (start_angle,end_angle+1,8):
         CalcXFinal = center[0] + (WIDTH-350) * math.cos(math.radians(i))
         CalcYFinal = center[1] - (WIDTH-350) * math.sin(math.radians(i))
-        #CalcXInit = center[0] + HEIGHT//4 * math.cos(math.radians(i))
-        #CalcYInit = center[1] - HEIGHT//4 * math.sin(math.radians(i)) 
-        cv.line(img,(int(center[0]),int(center[1])),(int(CalcXFinal),int(CalcYFinal)),color = 255, thickness= 1)
+        cv.line(img,(int(center[0]),int(center[1])),(int(CalcXFinal),int(CalcYFinal)),color = 255, thickness = 1)
 
 def drawLidar(img, center, start_radius, end_radius):
     for i in range (start_radius,end_radius+1,30):
@@ -40,39 +38,7 @@ def getContours(img):
         for i in l:
             for j in i:
                 merged_list.append(j)
-
     return merged_list
-
-def stackImages(scale,imgArray):
-    rows = len(imgArray)
-    cols = len(imgArray[0])
-    rowsAvailable = isinstance(imgArray[0], list)
-    width = imgArray[0][0].shape[1]
-    height = imgArray[0][0].shape[0]
-    if rowsAvailable:
-        for x in range ( 0, rows):
-            for y in range(0, cols):
-                if imgArray[x][y].shape[:2] == imgArray[0][0].shape [:2]:
-                    imgArray[x][y] = cv.resize(imgArray[x][y], (0, 0), None, scale, scale)
-                else:
-                    imgArray[x][y] = cv.resize(imgArray[x][y], (imgArray[0][0].shape[1], imgArray[0][0].shape[0]), None, scale, scale)
-                if len(imgArray[x][y].shape) == 2: imgArray[x][y]= cv.cvtColor( imgArray[x][y], cv.COLOR_GRAY2BGR)
-        imageBlank = np.zeros((height, width, 3), np.uint8)
-        hor = [imageBlank]*rows
-        hor_con = [imageBlank]*rows
-        for x in range(0, rows):
-            hor[x] = np.hstack(imgArray[x])
-        ver = np.vstack(hor)
-    else:
-        for x in range(0, rows):
-            if imgArray[x].shape[:2] == imgArray[0].shape[:2]:
-                imgArray[x] = cv.resize(imgArray[x], (0, 0), None, scale, scale)
-            else:
-                imgArray[x] = cv.resize(imgArray[x], (imgArray[0].shape[1], imgArray[0].shape[0]), None,scale, scale)
-            if len(imgArray[x].shape) == 2: imgArray[x] = cv.cvtColor(imgArray[x], cv.COLOR_GRAY2BGR)
-        hor= np.hstack(imgArray)
-        ver = hor
-    return ver
 
 def filterExtreme(points):
     x = [i[0] for i in points]
@@ -121,7 +87,6 @@ def controlProcess(u):
     u = u * Kp
     u = u * -1      # por causa do simulador
     return u    
-
 
 def twoLineAlgorithm(img, flag):
     global u

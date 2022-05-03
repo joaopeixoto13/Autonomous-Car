@@ -4,6 +4,7 @@ from cv2 import determinant
 import numpy as np
 import math
 import imutils
+from utils import *
 
 WIDTH = 640
 HEIGHT = 480
@@ -17,32 +18,6 @@ def ImgProcess(img):
     img = cv.blur(img,(5,5))
     _,img = cv.threshold(img,170,255,cv.THRESH_BINARY)
     return img
-
-def warpingFrame(img):
-    WarpingPoints = np.float32([[150, 150], [WIDTH-150, 150],
-                       [0, HEIGHT], [WIDTH, HEIGHT]])
-    ImagePoints = np.float32([[0, 0], [WIDTH, 0],
-                       [0, HEIGHT], [WIDTH, HEIGHT]])
-
-    matrix = cv.getPerspectiveTransform(WarpingPoints, ImagePoints)
-    img = cv.warpPerspective(img, matrix, (WIDTH, HEIGHT))
-    return img
-
-def drawHist(img, flag):
-    img_y_sum = np.sum(img,axis=1)
-    img_x_sum = np.sum(img,axis=0)
-    img_x_sum = img_x_sum/255
-    img_y_sum = img_y_sum/255
-    if flag == 1:
-        HH = np.zeros((100,img.shape[1]), np.uint8)
-        for c in range(img.shape[1]):
-            cv.line(HH, (c, 100), (c, 100-int(img_x_sum[c]*100/255)),255)
-        cv.imshow('HH', HH)
-        HV = np.zeros((img.shape[0],100), np.uint8)
-        for l in range(img.shape[0]):
-            cv.line(HV, (0, l),(int(img_y_sum[l]*100/255), l), 255)
-        cv.imshow('HV', HV)
-    return img_x_sum, img_y_sum
 
 def distinguishLine(frame):
     # 0 if Left, 1 if Right, 2 if Horizontal

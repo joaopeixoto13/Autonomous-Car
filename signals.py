@@ -1,5 +1,4 @@
 import cv2 as cv
-from cv2 import threshold
 import numpy as np
 
 WIDTH = 50
@@ -32,10 +31,10 @@ image_1 = cv.resize(image_1, (WINDOW_WIDTH, WINDOW_HEIGHT))
 image_2 = cv.resize(image_2, (WINDOW_WIDTH, WINDOW_HEIGHT))
 image_3 = cv.resize(image_3, (WINDOW_WIDTH, WINDOW_HEIGHT))
 image_4 = cv.resize(image_4, (WINDOW_WIDTH, WINDOW_HEIGHT))
-image_5 = cv.resize(image_5, (WINDOW_WIDTH, WINDOW_HEIGHT))
+image_5 = cv.resize(image_5, (WINDOW_WIDTH, WINDOW_HEIGHT)) 
 
 signals = [left_signal, ahead_signal, right_signal, stop_signal, park_signal, finish_signal]
-images = [image_1, image_2, image_3, image_4, image_5] """
+images = [image_1, image_2, image_3, image_4, image_5]  """
 
 # BGR
 boundaries = [
@@ -86,12 +85,13 @@ def detectSignal(img):
         gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         gray_img = cv.resize(gray_img, (0, 0), fx=stretch_x_factor, fy=stretch_y_factor)
         _, gray_img = cv.threshold(gray_img, 50, 255, cv.THRESH_BINARY)
-        contours, _ = cv.findContours(gray_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-        contours = np.squeeze(contours)
-        min = contours.min(axis=0)
-        max = contours.max(axis=0)
-        Xc = (min[0] + max[0]) // 2
-        Yc = (min[1] + max[1]) // 2
+        pos = np.nonzero(gray_img)
+        xmin = pos[1].min()
+        xmax = pos[1].max()
+        ymin = pos[0].min()
+        ymax = pos[0].max()
+        Xc = (xmin + xmax) // 2
+        Yc = (ymin + ymax) // 2
 
         M = cv.moments(gray_img)
         cX = int(M["m10"] / M["m00"])
@@ -105,3 +105,10 @@ def detectSignal(img):
             return "ahead"
     else:
         return "none"
+
+
+""" for img in images:
+    print(detectSignal(img))
+    cv.imshow("Image", img)
+    cv.waitKey(0)
+cv.destroyAllWindows() """

@@ -111,8 +111,13 @@ if clientID != -1:  # verifica que se conseguio ligar a simulação
             imgSignal = cv2.flip(imgSignal, 0)
             imgSignal = cv2.cvtColor(imgSignal, cv2.COLOR_RGB2BGR)
 
-            print(detectSignal(imgSignal))
-            u = encode_FSM(img)
+            """ if (obstacleDetection(img)):
+                print("Obstacle detected") """
+            #print(detectSignal(imgSignal))
+            #u = encode_FSM(img)
+
+            vel, u = encode_FSM(img, imgSignal)
+
             cv2.imshow('image', img)
 
             out.write(img)
@@ -125,7 +130,7 @@ if clientID != -1:  # verifica que se conseguio ligar a simulação
             else:
                 fps += 1
         else:
-            print(f"Camera error {count}")
+            #print(f"Camera error {count}")
             count += 1
     sim.simxStopSimulation(clientID, sim.simx_opmode_oneshot_wait)
     out.release()
