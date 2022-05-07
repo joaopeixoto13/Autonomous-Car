@@ -62,7 +62,7 @@ def controlProcess(u):
     #u = u * -1
     return u
 
-def oneLineAlgorithm(imgA):
+def warpingAlgorithm(imgA):
     global angle_prev
     global angle_var
     global angle_step
@@ -104,4 +104,4 @@ angle_var = 36
 angle_step = 3
 forward_line_th = 10
 angle_x = 0
-Kp = 0.65
+Kp = 0.65 

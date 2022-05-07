@@ -38,73 +38,74 @@ images = [image_1, image_2, image_3, image_4, image_5]  """
 
 # BGR
 boundaries = [
-    ([0, 230, 0], [25, 255, 25]),       # green
-    ([0, 0, 230], [25, 25, 255]),       # red
-    ([0, 200, 220], [25, 255, 255]),    # yellow
+    ([0, 230, 0], [25, 255, 25]),       # Green detection boundaries
+    ([0, 0, 230], [25, 25, 255]),       # Red detection boundaries
+    ([0, 200, 220], [25, 255, 255]),    # Yellow detection boundaries
 ]
 
 def separateColors(img):
-    output = []
-    for lower, upper in boundaries:
-        lower = np.array(lower, dtype="uint8")
-        upper = np.array(upper, dtype="uint8")
+    output = [] 
+    for lower, upper in boundaries:                         # For each boundarie
+        lower = np.array(lower, dtype="uint8")              # Get the lower boundarie and convert to numpy array
+        upper = np.array(upper, dtype="uint8")              # Get the upper boundarie and convert to numpy array
 
-        mask = cv.inRange(img, lower, upper)
-        output.append(cv.bitwise_and(img, img, mask=mask))
-    return output
+        mask = cv.inRange(img, lower, upper)                # Create a mask with the boundarie
+        output.append(cv.bitwise_and(img, img, mask=mask))  # Apply the mask to the image
+    return output                                           # Return the list of images
 
-def isolateSignal(img):
-    output = separateColors(img)
-    final_img = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)
-    for i in range(0, len(output)):
-        final_img = cv.bitwise_or(final_img, output[i])
-    return final_img
+def isolateSignal(img): 
+    output = separateColors(img)                                            # Separate the colors
+    final_img = np.zeros((img.shape[0], img.shape[1], 3), np.uint8)         # Create a black image
+    for i in range(0, len(output)):                                         # For each color
+        final_img = cv.bitwise_or(final_img, output[i])                     # Add the color to the final image
+    return final_img                                                        # Return the final image
 
 def detectSignal(img):
-    max_th = 5
-    min_th = 25
-    stretch_x_factor = 7
-    stretch_y_factor = 1
-    arrow_th = 4
-    img = isolateSignal(img)
-    b, g, r = cv.split(img)
-    b, g, r = b.sum()//255, g.sum()//255, r.sum()//255
-
+    max_th = 5                                                              # Maximum threshold
+    min_th = 25                                                             # Minimum threshold
+    stretch_x_factor = 7                                                    # Stretch factor in x direction
+    stretch_y_factor = 1                                                    # Stretch factor in y direction
+    arrow_th = 4                                                            # Threshold for the arrow
+    img = isolateSignal(img)                                                # Isolate the signal
+    b, g, r = cv.split(img)                                                 # Split the image into BGR
+    b, g, r = b.sum()//255, g.sum()//255, r.sum()//255                      # Rescale each color
+ 
     # Park or Finish
-    if g > b*max_th and r > b*max_th:
-        output = separateColors(img)
-        if output[1].sum() > min_th:
-            return "finish"
-        elif output[2].sum() > min_th:
-            return "park"
-        else:
-            return "none"
-    elif r > b*max_th and r > g*max_th: 
-        return "stop"
-    elif g > b*max_th and g > r*max_th:
-        gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        gray_img = cv.resize(gray_img, (0, 0), fx=stretch_x_factor, fy=stretch_y_factor)
-        _, gray_img = cv.threshold(gray_img, 50, 255, cv.THRESH_BINARY)
-        pos = np.nonzero(gray_img)
-        xmin = pos[1].min()
-        xmax = pos[1].max()
-        ymin = pos[0].min()
-        ymax = pos[0].max()
-        Xc = (xmin + xmax) // 2
-        Yc = (ymin + ymax) // 2
+    if g > b*max_th and r > b*max_th:                                       # If the green and red are much greater than the blue
+        output = separateColors(img)                                        # Separate the colors
+        if output[1].sum() > min_th:                                        # If the red is greater than the minimum threshold
+            return "finish"                                                 # Return finish
+        elif output[2].sum() > min_th:                                      # If the yellow is greater than the minimum threshold
+            return "park"                                                   # Return park
+        else:                                                               # If none of the above
+            return "none"                                                   # Return none (error case)
+    elif r > b*max_th and r > g*max_th:                                     # If the red is much greater than the blue and green
+        return "stop"                                                       # Return stop
+    elif g > b*max_th and g > r*max_th:                                     # If the green is much greater than the blue and red
+        gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)                      # Convert the image to grayscale
+        gray_img = cv.resize(gray_img, (0, 0), fx=stretch_x_factor, fy=stretch_y_factor)    # Stretch the image
+        _, gray_img = cv.threshold(gray_img, 50, 255, cv.THRESH_BINARY)     # Threshold the image
+        pos = np.nonzero(gray_img)                                          # Get the nonzero values
+        xmin = pos[1].min()                                                 # Get the minimum x value
+        xmax = pos[1].max()                                                 # Get the maximum x value
+        ymin = pos[0].min()                                                 # Get the minimum y value
+        ymax = pos[0].max()                                                 # Get the maximum y value
+                                                                            # Calculate the centroid
+        Xc = (xmin + xmax) // 2                                             # Get the x center
+        Yc = (ymin + ymax) // 2                                             # Get the y center
 
-        M = cv.moments(gray_img)
-        cX = int(M["m10"] / M["m00"])
-        cY = int(M["m01"] / M["m00"])
+        M = cv.moments(gray_img)                                            # Get the moments
+        cX = int(M["m10"] / M["m00"])                                       # Get the x mass center
+        cY = int(M["m01"] / M["m00"])                                       # Get the y mass center
 
-        if cX > Xc + arrow_th:
-            return "right"
-        elif cX < Xc - arrow_th:
-            return "left"
-        else:
-            return "ahead"
-    else:
-        return "none"
+        if cX > Xc + arrow_th:                                              # If the x mass center is greater than the x center + the threshold
+            return "right"                                                  # Return right
+        elif cX < Xc - arrow_th:                                            # If the x mass center is less than the x center - the threshold
+            return "left"                                                   # Return left
+        else:                                                               # If the x mass center is less than the x center + the threshold
+            return "ahead"                                                  # Return ahead
+    else:                                                                   # If none of the above
+        return "none"                                                       # Return none (error case)
 
 
 """ for img in images:

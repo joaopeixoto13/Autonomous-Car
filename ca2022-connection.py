@@ -9,15 +9,6 @@ import numpy as np
 import sys
 from state_machine import encode_FSM
 from signals import detectSignal
-#import Lines
-#from test import detectLines
-
-###################
-## BEST SETTINGS ##
-#   Kp = 0.75    ##
-#   std = 0.70   ##
-#   mean = 0.30  ##
-###################
 
 # N A O   E S Q U E C E R
 # fazer esta linha no coppelia antes de iniciar simulação
@@ -118,7 +109,7 @@ if clientID != -1:  # verifica que se conseguio ligar a simulação
 
             vel, u = encode_FSM(img, imgSignal)
 
-            cv2.imshow('image', img)
+            #cv2.imshow('image', img)
 
             out.write(img)
             frames += 1
