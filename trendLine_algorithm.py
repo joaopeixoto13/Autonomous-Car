@@ -203,7 +203,7 @@ def trendLineAlgorithm(frame, priority, n_lines):
             u  = controlProcess(u)                                                                                  # Apply control process
             u_temp = varianceAlgorithm(frame_copy)                                                                  # Apply variance algorithm for smoothing
             #print(f"trend u: {u}, var u: {u_temp}")                                                                 # Print control values
-            u = (0.35*u + 0.65*u_temp) / 2                                                                          # Apply weighted mean filter (65% of weighted trendline algorithm and 35% of variance algorithm)
+            u = (0.7*u + 0.3*u_temp) / 2                                                                          # Apply weighted mean filter (65% of weighted trendline algorithm and 35% of variance algorithm)
             u_k = 0                                                                                                 # Reset control value
         #print(u)
         return u                                                                                                    # Return control value

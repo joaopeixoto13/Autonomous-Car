@@ -5,12 +5,12 @@ from utils import filterGreen
 
 WIDTH = 640
 HEIGHT = 480
-BLOCK_NUMBER = 6500
+BLOCK_NUMBER = 15000
 BLOCK_X_TH = WIDTH//2
-BLOCK_Y_TH = HEIGHT//3.3
-BLOCK_X_TH_TH = 100
+BLOCK_Y_TH = HEIGHT//2.5
+BLOCK_X_TH_TH = 40
  
-def detectObstacle(img):
+def detectObstacle(img, angle):
     block = cv.resize(img, (WIDTH,HEIGHT))                                  # Resize the image
     block = filterGreen(block)                                              # Filter the image
     gray_block = cv.cvtColor(block, cv.COLOR_BGR2GRAY)                      # Convert the image to grayscale
@@ -25,8 +25,9 @@ def detectObstacle(img):
     ymin = pos[0].min()                                                    # Get the minimum y coordinate 
     ymax = pos[0].max()                                                    # Get the maximum y coordinate
 
-    #print(len(pos[0]))
-    if len(pos[0]) > BLOCK_NUMBER and ymax >= BLOCK_Y_TH and (math.fabs((xmax+xmin)//2 - BLOCK_X_TH) < BLOCK_X_TH_TH):   # If there are more than 8000 points and the block is in the middle of the image
+    print(f"N: {len(pos[0])}, Angle: {angle}, xmin: {xmin}, xmax: {xmax}")
+    
+    if len(pos[0]) > BLOCK_NUMBER and ymax >= BLOCK_Y_TH and (math.fabs((xmax+xmin)//2 - (BLOCK_X_TH - angle*15)) < BLOCK_X_TH_TH):  
         return 1                                                            # Return 1
     else:                                                                   # If there are less than 8000 points or the block is not in the middle of the image
         return 0                                                            # Return 0

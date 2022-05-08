@@ -1,6 +1,5 @@
 import numpy as np
 import cv2 as cv
-from test import WIDTH
 #from variance_algorithm import twoLineAlgorithm
 #from warpingHist_algorithm import warpingAlgorithm
 #from warpingHist_algorithm import getHistInfo
@@ -12,6 +11,9 @@ from obstacleDetection import detectObstacle
 from utils import detectCrossWalk, crossWalkControl
 from parking import processPark
 import time
+
+WIDTH = 640
+HEIGHT = 480
 
 # States
 STATE_STOP = 0
@@ -53,12 +55,10 @@ priority = PRIORITY_LEFT                # Priority
 side = SIDE_RIGHT                       # Car side
 vel = 0                                 # Velocity
 angle = 0                               # Angle
-prev_cross = STATE_CROSSWALK_1          # Previous crosswalk detected
+prev_cross = STATE_CROSSWALK_2          # Previous crosswalk detected
 cross_flag = 1                          # Flag to detect crosswalk
 angle_save = 0                          # Angle save
 vtimer = 0                              # Virtual timer variable
-start = time.time()                     # Start time
-
 
 # Stop state
 def stop():
@@ -119,14 +119,14 @@ def run(frame):
     global cross_flag
     global start
     vel = 3                                         # Set the velocity to 3
-    if (detectObstacle(frame) == 1):                # If there is an obstacle
+    if (detectObstacle(frame, angle) == 1):         # If there is an obstacle
         next_state = STATE_OBSTACLE                 # Change the state
         vel = 0                                     # Stop the car
         angle = 0                                   # Set the angle to zero
         return                                      # Return
     n_lines = detectLines(frame, 0)                 # Detect the lines 
     isCrossWalk = detectCrossWalk(frame)            # Detect the crosswalk
-    if (n_lines == NO_LINES and prev_cross == STATE_CROSSWALK_1 and isCrossWalk == 0 and time.time()-start >= 20):  # If the car is in the junction
+    if (n_lines == NO_LINES and prev_cross == STATE_CROSSWALK_1 and isCrossWalk == 0):                              # If the car is in the junction
         next_state = STATE_JUNCTION_1                                                                               # Change the state
         vel = 3.5                                                                                                   # Set the velocity to 3.5
         cross_flag = 0                                                                                              # Reset the crosswalk flag
@@ -138,7 +138,6 @@ def run(frame):
         next_state = STATE_CROSSWALK_1                                                                              # Change the state
         vel = 1                                                                                                     # Set the velocity to 1
         cross_flag = 1                                                                                              # Set the crosswalk flag
-        start = time.time()                                                                                         # Reset the start time
     elif (isCrossWalk == 0):                                                                                        # If the car is not in the crosswalk
         next_state = STATE_RUN                                                                                      # The state is run
         cross_flag = 0                                                                                              # Reset the crosswalk flag
@@ -156,7 +155,7 @@ def junction_1(frame):
     global vel
     global angle
     global next_state
-    """ if (detectObstacle(frame) == 1):                                    # If there is an obstacle
+    """ if (detectObstacle(frame, angle) == 1):                                    # If there is an obstacle
         print("Impossible to go to the junction: Obstacle detected")    # Print the error message
         next_state = STATE_IDLE                                         # Change the state
         vel = 0                                                         # Stop the car
@@ -214,23 +213,24 @@ def obstacle(frame):
     global subState
     global angle_save
     global vtimer
+    global priority
     next_state = STATE_OBSTACLE                                     # Change the state
+    vel = 2.5                                                       # Set the velocity to 2.5
     if (subState == 0):                                             # Detected the obstacle 
         print("Obstacle 0")      
         if (side == SIDE_RIGHT):                                    # If the car is on the right side of the road
+            priority = PRIORITY_RIGHT                               # Set the priority
             angle = 30                                              # Turn left in order to avoid the obstacle
         else:                                                       # If the car is on the left side of the road
             angle = -30                                             # Turn right in order to avoid the obstacle
         angle_save = angle                                          # Save the angle
-        vel = 2                                                     # Set the velocity to 1
         subState = 1                                                # Update the sub-state to 1
         vtimer = time.time()                                        # Reset the time
 
     elif (subState == 1):                                           # Avoid the obstacle
         print("Obstacle 1")
         n_lines = detectLines(frame, 0)                             # Detect the lines
-        vel = 2                                                     # Set the velocity to 1
-        if (time.time()-vtimer >= 1.85):                            # If there are two lines and the time is greater than 1.5 seconds
+        if (time.time()-vtimer >= 2):                               # If there are two lines and the time is greater than 1.5 seconds
             subState = 2                                            # The car already passed the obstacle
             angle = trendLineAlgorithm(frame, priority, n_lines)    # Calculate the angle
             vtimer = time.time()                                    # Reset the time
@@ -240,9 +240,7 @@ def obstacle(frame):
     
     elif (subState == 2):                                           # Walk in this lane for a while (4s)
         print("Obstacle 2")
-        vel = 3                                                     # Set the velocity to 2
-        if (time.time()-vtimer >= 3):                               # If the time is greater than 4 seconds
-            vel = 2                                                 # Set the velocity to 1
+        if (time.time()-vtimer >= 5):                               # If the time is greater than 3 seconds
             angle = -1 * angle_save                                 # Turn the car to the oposite angle saved
             subState = 3                                            # Update the sub-state to 3
             vtimer = time.time()                                    # Reset the time
@@ -250,16 +248,20 @@ def obstacle(frame):
             n_lines = detectLines(frame, 0)                         # Detect the lines
             angle = trendLineAlgorithm(frame, priority, n_lines)    # Calculate the angle
             subState = 2                                            # The car is still in the sub-state 2
+            vel = 3                                                 # Set the velocity to 3
+
 
     elif (subState == 3):                                           # The car must turn back to the lane 
         print("Obstacle 3")
-        vel = 2                                                     # Set the velocity to 1
         n_lines = detectLines(frame, 0)                             # Detect the lines
-        if (time.time()-vtimer >= 1.85):                             # If there are two lines
+        if (time.time()-vtimer >= 2):                               # If there are two lines
             next_state = STATE_RUN                                  # Go to the RUN state, because the car is in the lane
+            vel = 3                                                 # Set the velocity to 3
             subState = 0                                            # Reset the sub state for new iterations
             angle = trendLineAlgorithm(frame, priority, n_lines)    # Calculate the angle
             vtimer = time.time()                                    # Reset the time
+            if (side == SIDE_RIGHT):                                # If the car is on the right side of the road
+                priority = PRIORITY_LEFT                            # Set the priority
         else:                                                       # If there are not two lines
             angle = -1 * angle_save                                 # Keep turning the car to the oposite angle saved
             subState = 3                                            # The car is still in the sub-state 3
@@ -280,7 +282,7 @@ def park(img):
     global vtimer
     next_state = STATE_PARK                                             # Change the state
     vel = 2                                                             # Set the velocity to 2
-    if (detectObstacle(img) == 1):                                      # If there is an obstacle
+    if (detectObstacle(img, angle) == 1):                               # If there is an obstacle
         print("Impossible to park: Obstacle detected")                  # Print the error message
         next_state = STATE_IDLE                                         # Change the state
         vel = 0                                                         # Stop the car
@@ -392,7 +394,7 @@ def junction_2(img):
     global vtimer
     next_state = STATE_JUNCTION_2                                       # Change the state
     vel = 3                                                             # Set the velocity to 3
-    if (detectObstacle(img) == 1):                                      # If there is an obstacle
+    if (detectObstacle(img, angle) == 1):                                      # If there is an obstacle
         print("Impossible to go to the junction: Obstacle detected")    # Print the error message
         next_state = STATE_IDLE                                         # Change the state
         vel = 0                                                         # Stop the car
@@ -452,8 +454,6 @@ def encode_FSM(frame, signalFrame):
     global vel
     global angle
 
-    cv.imshow("img", frame)
-
     if (state == STATE_STOP):                                       
         print("Stop")
         stop()                                                          
@@ -484,4 +484,6 @@ def encode_FSM(frame, signalFrame):
 
     state = next_state
     #print(angle)
+    frame = cv.resize(frame, (WIDTH, HEIGHT))
+    cv.imshow("Frame", frame)
     return vel, angle

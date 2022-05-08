@@ -31,7 +31,6 @@ def controlProcess(u):
     u_array = np.multiply(u_array, n_array)                     # Multiply array by n_array
     u_mean = np.sum(u_array)                                    # Sum array
     u = u_mean * Kp                                             # Proportional control
-    #Kp = 1 - 0.05 * Kp
     if (u > 60):                                                # Limit control
         u = 60                                                  # to 60
     elif (u < -60):                                             # Limit control
@@ -67,7 +66,7 @@ def processPark(img):
     
     n_l = np.count_nonzero(img_l)                                                                       # Count the number of non-zero pixels in the left half of the image
     n_r = np.count_nonzero(img_r)                                                                       # Count the number of non-zero pixels in the right half of the image
-    #print(f"n_l: {n_l}, n_r: {n_r}")
+    print(f"n_l: {n_l}, n_r: {n_r}")
     
     cX_l, cY_l = getMoments(img_l)                                                                      # Get the x and y mass center of the left half of the image
     cX_r, cY_r = getMoments(img_r)                                                                      # Get the x and y mass center of the right half of the image
