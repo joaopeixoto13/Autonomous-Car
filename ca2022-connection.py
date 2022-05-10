@@ -55,33 +55,6 @@ if clientID != -1:  # verifica que se conseguio ligar a simulação
 
         tecla = cv2.waitKey(1)
         ang = u
-        #print(u)
-        """ if (u > 60):
-            u = 60
-        elif (u < -60):
-            u = -60
-        u = u * Kp
-        #ang = u * -1 
-        ang = u
-        print(ang) """
-
-        """ tecla = cv2.waitKey(1)
-        if tecla == ord('a'): # aumenta angulo esquerda
-            ang += ang_base
-            if ang > 60:
-                ang = 60
-        elif tecla == ord('d'): # aumenta angulo direita
-            ang -= ang_base
-            if ang < -60:
-                ang = -60
-        elif tecla == ord('w'): # aumenta velocidade
-            vel += vel_base
-        elif tecla == ord('s'): # diminui velocidade
-            vel -= vel_base
-        elif tecla == ord(' '): # paragem de emergencia Tecla de espaço
-            vel = 0
-            ang = 0  """
-        #print(f"Angle: {ang}")
 
         # atribui valores aos atuadores
         sim.simxSetJointTargetVelocity(clientID, motorR, vel, sim.simx_opmode_oneshot)
@@ -102,14 +75,7 @@ if clientID != -1:  # verifica que se conseguio ligar a simulação
             imgSignal = cv2.flip(imgSignal, 0)
             imgSignal = cv2.cvtColor(imgSignal, cv2.COLOR_RGB2BGR)
 
-            """ if (obstacleDetection(img)):
-                print("Obstacle detected") """
-            #print(detectSignal(imgSignal))
-            #u = encode_FSM(img)
-
             vel, u = encode_FSM(img, imgSignal)
-
-            #cv2.imshow('image', img)
 
             out.write(img)
             frames += 1

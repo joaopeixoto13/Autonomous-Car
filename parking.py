@@ -1,48 +1,40 @@
 import cv2 as cv
 import numpy as np
-from utils import filterGreen, drawHist
+from utils import filterGreen, getMoments
 
 WIDTH = 640
 HEIGHT = 480
 
-#n_array = np.array([0.05, 0.1, 0.15, 0.20, 0.5])
-n_array = np.array([0.2, 0.2, 0.2, 0.2, 0.2])
-u_array =  np.array([0,0,0,0,0], dtype=float)                                   # Array of control values
-Kp = 0.3                                                                        # Proportional gain
-X = 0
+n_array = np.array([0.2, 0.2, 0.2, 0.2, 0.2])                                                           # Array of weights
+u_array =  np.array([0,0,0,0,0], dtype=float)                                                           # Array of control values
+Kp = 0.3                                                                                                # Proportional gain
+X = 0       
 Y = 0
 u = 0
-checkPark = 0
-parkStatus = 0
-OBSTACLE_TH = 2500
-OBSTACLE_TH_LIMIT = 13000
-NO_OBSTACLE = 0
-OBSTACLE_LEFT = 1
-OBSTACLE_RIGHT = 2
-OBSTACLE_LEFT_AND_RIGHT = 3
-LINE_TH = 50
+checkPark = 0                                                                                           # Check if the park is checked
+parkStatus = 0                                                                                          # 0 if not checked, 1 if checked
+OBSTACLE_TH = 2500                                                                                      # Threshold to detect obstacle
+OBSTACLE_TH_LIMIT = 13000                                                                               # Limit to detect obstacle
+NO_OBSTACLE = 0                                                                                         # No obstacle
+OBSTACLE_LEFT = 1                                                                                       # Obstacle on the left
+OBSTACLE_RIGHT = 2                                                                                      # Obstacle on the right
+OBSTACLE_LEFT_AND_RIGHT = 3                                                                             # Obstacle on the left and right
 
-def controlProcess(u):
+def parkControlProcess(u):
     global n_array  
     global u_array
     global Kp 
-    u_array = np.roll(u_array, -1, axis=0)                      # Roll array to the left
-    u_array[4] = u                                              # Insert new value in array
-    u_array = np.multiply(u_array, n_array)                     # Multiply array by n_array
-    u_mean = np.sum(u_array)                                    # Sum array
-    u = u_mean * Kp                                             # Proportional control
-    if (u > 60):                                                # Limit control
-        u = 60                                                  # to 60
-    elif (u < -60):                                             # Limit control
-        u = -60                                                 # to -60
-    u = u * -1                                                  # Invert control (to make it work on simulator)
-    return u                                                    # Return control value
-
-def getMoments(img):
-    M = cv.moments(img)                                                                       # Get the moments 
-    cX = int(M["m10"] / M["m00"])                                                             # Get the x mass center
-    cY = int(M["m01"] / M["m00"])                                                             # Get the y mass center 
-    return cX, cY
+    u_array = np.roll(u_array, -1, axis=0)                                                              # Roll array to the left
+    u_array[4] = u                                                                                      # Insert new value in array
+    u_array = np.multiply(u_array, n_array)                                                             # Multiply array by n_array
+    u_mean = np.sum(u_array)                                                                            # Sum array
+    u = u_mean * Kp                                                                                     # Proportional control
+    if (u > 60):                                                                                        # Limit control
+        u = 60                                                                                          # to 60
+    elif (u < -60):                                                                                     # Limit control
+        u = -60                                                                                         # to -60
+    u = u * -1                                                                                          # Invert control (to make it work on simulator)
+    return u                                                                                            # Return control value
 
 def processPark(img):
     global checkPark
@@ -104,9 +96,6 @@ def processPark(img):
             X = cX_r + WIDTH//2                                                                         # Get the x coordinate that the car should go to 
             Y = cY_r                                                                                    # Get the y coordinate that the car should go to 
     cv.line(img_copy, (X, 0), (X, HEIGHT), 255, 5)                                                      # Draw the vertical line
-    #cv.imshow("img", img_copy)
-    #cv.line(img_copy, (0, Y), (WIDTH, Y), 255, 2)                                                      # Draw the horizontal line
-    #print(f"X: {X}, Y: {Y}, u: {u}")
     error = X - WIDTH//2 
-    u = controlProcess(error)
+    u = parkControlProcess(error)
     return u, parkStatus 

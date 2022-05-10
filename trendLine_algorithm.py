@@ -11,9 +11,6 @@ from variance_algorithm import varianceAlgorithm, varianceClearSignal
 
 WIDTH = 640
 HEIGHT = 480
-CENTER_COORD = (WIDTH//2,HEIGHT-1)
-font = cv.FONT_HERSHEY_COMPLEX
- 
 
 def imgProcess(img):
     img = cv.resize(img, (WIDTH,HEIGHT))                                                                # Resize image
@@ -26,50 +23,49 @@ def imgProcess(img):
     img = img - horizontal_lines                                                                        # Subtract horizontal lines from original image, leaving only the vertical and diagonal lines
     return img                                                                                          # Return image
 
-def drawVirtualCircles(img, center, start_radius, end_radius, thick):
-    for i in range (start_radius,end_radius+1,10):
-        cv.ellipse(img,center,(i,i),0,15,165, color = 255, thickness= thick)
+def drawVirtualCircles(img, center, start_radius, end_radius, thick):                                   
+    for i in range (start_radius,end_radius+1,10):                                                      # Iterate over all radius values
+        cv.ellipse(img,center,(i,i),0,15,165, color = 255, thickness= thick)                        
     return img
 
 def trendLine(points):
-    x = [i[0] for i in points]                                  # Create x array
-    y = [i[1] for i in points]                                  # Create y array
-    A = np.vstack([x, np.ones(len(x))]).T                       # Create A matrix
-    m, c = np.linalg.lstsq(A, y,rcond=None)[0]                  # Solve for m and c
-    return m,c                                                  # Return the slope (m) and y-intercept (c)
+    x = [i[0] for i in points]                                                                          # Create x array
+    y = [i[1] for i in points]                                                                          # Create y array
+    A = np.vstack([x, np.ones(len(x))]).T                                                               # Create A matrix
+    m, c = np.linalg.lstsq(A, y,rcond=None)[0]                                                          # Solve for m and c
+    return m,c                                                                                          # Return the slope (m) and y-intercept (c)
 
 def drawTrendLine(slope, b, img,color):
-    for i in range(0,WIDTH):                                    # Iterate over all x pixels in image
-        y = slope * i + b                                       # Calculate y value for each x
-        cv.line(img,(i,int(y)),(i,int(y)),color,1)              # Draw the corresponding line
+    for i in range(0,WIDTH):                                                                            # Iterate over all x pixels in image
+        y = slope * i + b                                                                               # Calculate y value for each x
+        cv.line(img,(i,int(y)),(i,int(y)),color,1)                                                      # Draw the corresponding line
 
-def IIRFilter(a,y,x):                                           # IIR Filter function
-    y = a * y + (1 - a) * x                                     # IIR Filter equation
-    return round(y)                                             # Return filtered value
+def IIRFilter(a,y,x):                                                                                   
+    y = a * y + (1 - a) * x                                                                             # IIR Filter equation
+    return round(y)                                                                                     # Return filtered value
 
-def MeanFilter(u):                                              # Mean Filter function
+def MeanFilter(u):                                              
     global n_array  
     global u_array 
-    u_array = np.roll(u_array, -1, axis=0)                      # Roll array to the left
-    u_array[4] = u                                              # Insert new value in array
-    u_array = np.multiply(u_array, n_array)                     # Multiply array by n_array
-    u_mean = np.sum(u_array)                                    # Sum array
-    return u_mean                                               # Return mean value
+    u_array = np.roll(u_array, -1, axis=0)                                                              # Roll array to the left
+    u_array[4] = u                                                                                      # Insert new value in array
+    u_array = np.multiply(u_array, n_array)                                                             # Multiply array by n_array
+    u_mean = np.sum(u_array)                                                                            # Sum array
+    return u_mean                                                                                       # Return mean value
 
 def controlProcess(u):
-    u = u * Kp                                    # Proportional control
-    if (u > 60):                                  # Limit control
-        u = 60                                    # to 60
-    elif (u < -60):                               # Limit control
-        u = -60                                   # to -60
-    u = u * -1                                    # Invert control (to make it work on simulator)
-    return u                                      # Return control value
+    u = u * Kp                                                                                          # Proportional control
+    if (u > 60):                                                                                        # Limit control
+        u = 60                                                                                          # to 60
+    elif (u < -60):                                                                                     # Limit control
+        u = -60                                                                                         # to -60
+    u = u * -1                                                                                          # Invert control (to make it work on simulator)
+    return u                                                                                            # Return control value
 
 def detectLines(frame, flag):
     global n_lines
     imgA = imgProcess(frame)                                                                # Process image
     imgB = np.zeros((HEIGHT,WIDTH),dtype=np.uint8)                                          # Create empty image
-    #imgB2 = imgA.copy()                                                                    # Create empty image
 
     if (flag):
         imgA = cv.resize(frame, (WIDTH,HEIGHT))                                             # Resize image
@@ -80,7 +76,6 @@ def detectLines(frame, flag):
     else:
         imgA = imgProcess(frame) 
         drawVirtualCircles(imgB, (WIDTH//2,int(HEIGHT//2.5)), 70, 450, 2)                    # Draw virtual circles
-    #drawVirtualCircles(imgB2, (WIDTH//2,int(HEIGHT//2.5)), 70, 450)                         # Draw virtual circles
 
     imgC = cv.bitwise_and(imgA, imgB)                                                       # Apply bitwise and to get the points
     lines = cv.HoughLinesP(imgC,cv.HOUGH_PROBABILISTIC, np.pi/180, 10,None, 30,200)         # Apply Hough transform to get lines
@@ -92,8 +87,6 @@ def detectLines(frame, flag):
 
     imgC = cv.morphologyEx(imgC, cv.MORPH_ERODE, np.ones((17,17),np.uint8))                 # Apply erode filter
     contours, _ = cv.findContours(imgC, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)             # Find contours
-    
-    #cv.imshow("imgC", imgC)                                                                  # Show image
     
     final_contours = []
     for cnt in contours:
@@ -111,9 +104,6 @@ def detectLines(frame, flag):
                 final_contours.append(cnt)
 
     n_lines = len(final_contours)
-    #n_lines = IIRFilter(0.4, n_lines, len(contours))                                        # IIR Filter
-    #cv.imshow("imgC", imgC)
-    #print(n_lines)
     return n_lines                                                                          # Return number of lines
 
 def trendLineAlgorithm(frame, priority, n_lines):
@@ -221,7 +211,6 @@ n_lines = 0                                                                 # Nu
 angle = 0                                                                   # Angle of car
 m = 0                                                                       # Slope of line
 c = 0                                                                       # Y-intercept of line
-#n_array = np.array([0.05, 0.1, 0.15, 0.20, 0.5])                            # Array of weights for mean filter
 n_array = np.array([0.05, 0.1, 0.15, 0.20, 0.5])
 u_array =  np.array([0,0,0,0,0], dtype=float)                               # Array of control values
 Kp = 0.20                                                                   # Proportional gain

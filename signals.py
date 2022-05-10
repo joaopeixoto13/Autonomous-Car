@@ -38,20 +38,20 @@ images = [image_1, image_2, image_3, image_4, image_5]  """
 
 # BGR
 boundaries = [
-    ([0, 230, 0], [25, 255, 25]),       # Green detection boundaries
-    ([0, 0, 230], [25, 25, 255]),       # Red detection boundaries
-    ([0, 200, 220], [25, 255, 255]),    # Yellow detection boundaries
+    ([0, 230, 0], [25, 255, 25]),                                           # Green detection boundaries
+    ([0, 0, 230], [25, 25, 255]),                                           # Red detection boundaries
+    ([0, 200, 220], [25, 255, 255]),                                        # Yellow detection boundaries
 ]
 
 def separateColors(img):
     output = [] 
-    for lower, upper in boundaries:                         # For each boundarie
-        lower = np.array(lower, dtype="uint8")              # Get the lower boundarie and convert to numpy array
-        upper = np.array(upper, dtype="uint8")              # Get the upper boundarie and convert to numpy array
+    for lower, upper in boundaries:                                         # For each boundarie
+        lower = np.array(lower, dtype="uint8")                              # Get the lower boundarie and convert to numpy array
+        upper = np.array(upper, dtype="uint8")                              # Get the upper boundarie and convert to numpy array
 
-        mask = cv.inRange(img, lower, upper)                # Create a mask with the boundarie
-        output.append(cv.bitwise_and(img, img, mask=mask))  # Apply the mask to the image
-    return output                                           # Return the list of images
+        mask = cv.inRange(img, lower, upper)                                # Create a mask with the boundarie
+        output.append(cv.bitwise_and(img, img, mask=mask))                  # Apply the mask to the image
+    return output                                                           # Return the list of images
 
 def isolateSignal(img): 
     output = separateColors(img)                                            # Separate the colors
