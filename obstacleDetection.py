@@ -4,10 +4,10 @@ import numpy as np
 from utils import filterGreen
 
 WIDTH = 640
-HEIGHT = 480
+HEIGHT = 480 
 BLOCK_NUMBER = 15000                                                            # Number of points to be considered
 BLOCK_X_TH = WIDTH//2                                                           # X center coordinate of the block
-BLOCK_Y_TH = HEIGHT//2.5                                                        # Y center coordinate of the block
+BLOCK_Y_TH = HEIGHT//3                                                          # Y center coordinate of the block
 BLOCK_X_TH_TH = 40                                                              # Threshold for the x coordinate of the block
  
 def detectObstacle(img, angle):
@@ -25,7 +25,7 @@ def detectObstacle(img, angle):
     ymin = pos[0].min()                                                         # Get the minimum y coordinate 
     ymax = pos[0].max()                                                         # Get the maximum y coordinate
 
-    print(f"N: {len(pos[0])}, Angle: {angle}, xmin: {xmin}, xmax: {xmax}")
+    print(f"N: {len(pos[0])}, Angle: {angle}, xmin: {xmin}, xmax: {xmax}, ymax: {ymax}")
     
     if len(pos[0]) > BLOCK_NUMBER and ymax >= BLOCK_Y_TH and\
      (math.fabs((xmax+xmin)//2 - (BLOCK_X_TH - angle*15)) < BLOCK_X_TH_TH):  

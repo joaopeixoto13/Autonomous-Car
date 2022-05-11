@@ -140,3 +140,6 @@ def getMoments(img):
     cX = int(M["m10"] / M["m00"])                                                               # Get the x mass center
     cY = int(M["m01"] / M["m00"])                                                               # Get the y mass center 
     return cX, cY
+
+def euclideanDistance(p1,p2):
+    return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)

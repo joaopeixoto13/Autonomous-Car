@@ -1,4 +1,4 @@
-from cmath import isnan, pi
+""" from cmath import isnan, pi
 from ctypes.wintypes import HWINSTA
 import cv2 as cv
 from cv2 import determinant
@@ -11,6 +11,9 @@ from variance_algorithm import varianceAlgorithm, varianceClearSignal
 
 WIDTH = 640
 HEIGHT = 480
+CENTER_COORD = (WIDTH//2,HEIGHT-1)
+font = cv.FONT_HERSHEY_COMPLEX
+ 
 
 def imgProcess(img):
     img = cv.resize(img, (WIDTH,HEIGHT))                                                                # Resize image
@@ -23,49 +26,50 @@ def imgProcess(img):
     img = img - horizontal_lines                                                                        # Subtract horizontal lines from original image, leaving only the vertical and diagonal lines
     return img                                                                                          # Return image
 
-def drawVirtualCircles(img, center, start_radius, end_radius, thick):                                   
-    for i in range (start_radius,end_radius+1,10):                                                      # Iterate over all radius values
-        cv.ellipse(img,center,(i,i),0,15,165, color = 255, thickness= thick)                        
+def drawVirtualCircles(img, center, start_radius, end_radius, thick):
+    for i in range (start_radius,end_radius+1,10):
+        cv.ellipse(img,center,(i,i),0,15,165, color = 255, thickness= thick)
     return img
 
 def trendLine(points):
-    x = [i[0] for i in points]                                                                          # Create x array
-    y = [i[1] for i in points]                                                                          # Create y array
-    A = np.vstack([x, np.ones(len(x))]).T                                                               # Create A matrix
-    m, c = np.linalg.lstsq(A, y,rcond=None)[0]                                                          # Solve for m and c
-    return m,c                                                                                          # Return the slope (m) and y-intercept (c)
+    x = [i[0] for i in points]                                  # Create x array
+    y = [i[1] for i in points]                                  # Create y array
+    A = np.vstack([x, np.ones(len(x))]).T                       # Create A matrix
+    m, c = np.linalg.lstsq(A, y,rcond=None)[0]                  # Solve for m and c
+    return m,c                                                  # Return the slope (m) and y-intercept (c)
 
 def drawTrendLine(slope, b, img,color):
-    for i in range(0,WIDTH):                                                                            # Iterate over all x pixels in image
-        y = slope * i + b                                                                               # Calculate y value for each x
-        cv.line(img,(i,int(y)),(i,int(y)),color,1)                                                      # Draw the corresponding line
+    for i in range(0,WIDTH):                                    # Iterate over all x pixels in image
+        y = slope * i + b                                       # Calculate y value for each x
+        cv.line(img,(i,int(y)),(i,int(y)),color,1)              # Draw the corresponding line
 
-def IIRFilter(a,y,x):                                                                                   
-    y = a * y + (1 - a) * x                                                                             # IIR Filter equation
-    return round(y)                                                                                     # Return filtered value
+def IIRFilter(a,y,x):                                           # IIR Filter function
+    y = a * y + (1 - a) * x                                     # IIR Filter equation
+    return round(y)                                             # Return filtered value
 
-def MeanFilter(u):                                              
+def MeanFilter(u):                                              # Mean Filter function
     global n_array  
     global u_array 
-    u_array = np.roll(u_array, -1, axis=0)                                                              # Roll array to the left
-    u_array[4] = u                                                                                      # Insert new value in array
-    u_array = np.multiply(u_array, n_array)                                                             # Multiply array by n_array
-    u_mean = np.sum(u_array)                                                                            # Sum array
-    return u_mean                                                                                       # Return mean value
+    u_array = np.roll(u_array, -1, axis=0)                      # Roll array to the left
+    u_array[4] = u                                              # Insert new value in array
+    u_array = np.multiply(u_array, n_array)                     # Multiply array by n_array
+    u_mean = np.sum(u_array)                                    # Sum array
+    return u_mean                                               # Return mean value
 
 def controlProcess(u):
-    u = u * Kp                                                                                          # Proportional control
-    if (u > 60):                                                                                        # Limit control
-        u = 60                                                                                          # to 60
-    elif (u < -60):                                                                                     # Limit control
-        u = -60                                                                                         # to -60
-    u = u * -1                                                                                          # Invert control (to make it work on simulator)
-    return u                                                                                            # Return control value
+    u = u * Kp                                    # Proportional control
+    if (u > 60):                                  # Limit control
+        u = 60                                    # to 60
+    elif (u < -60):                               # Limit control
+        u = -60                                   # to -60
+    u = u * -1                                    # Invert control (to make it work on simulator)
+    return u                                      # Return control value
 
 def detectLines(frame, flag):
     global n_lines
     imgA = imgProcess(frame)                                                                # Process image
     imgB = np.zeros((HEIGHT,WIDTH),dtype=np.uint8)                                          # Create empty image
+    #imgB2 = imgA.copy()                                                                    # Create empty image
 
     if (flag):
         imgA = cv.resize(frame, (WIDTH,HEIGHT))                                             # Resize image
@@ -76,6 +80,7 @@ def detectLines(frame, flag):
     else:
         imgA = imgProcess(frame) 
         drawVirtualCircles(imgB, (WIDTH//2,int(HEIGHT//2.5)), 70, 450, 2)                    # Draw virtual circles
+    #drawVirtualCircles(imgB2, (WIDTH//2,int(HEIGHT//2.5)), 70, 450)                         # Draw virtual circles
 
     imgC = cv.bitwise_and(imgA, imgB)                                                       # Apply bitwise and to get the points
     lines = cv.HoughLinesP(imgC,cv.HOUGH_PROBABILISTIC, np.pi/180, 10,None, 30,200)         # Apply Hough transform to get lines
@@ -87,6 +92,8 @@ def detectLines(frame, flag):
 
     imgC = cv.morphologyEx(imgC, cv.MORPH_ERODE, np.ones((17,17),np.uint8))                 # Apply erode filter
     contours, _ = cv.findContours(imgC, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)             # Find contours
+    
+    #cv.imshow("imgC", imgC)                                                                  # Show image
     
     final_contours = []
     for cnt in contours:
@@ -104,6 +111,9 @@ def detectLines(frame, flag):
                 final_contours.append(cnt)
 
     n_lines = len(final_contours)
+    #n_lines = IIRFilter(0.4, n_lines, len(contours))                                        # IIR Filter
+    #cv.imshow("imgC", imgC)
+    #print(n_lines)
     return n_lines                                                                          # Return number of lines
 
 def trendLineAlgorithm(frame, priority, n_lines):
@@ -153,9 +163,9 @@ def trendLineAlgorithm(frame, priority, n_lines):
     line_points = []                                                                                                # Create empty array
 
     if(n_lines > 0 and n_lines < 3):                                                                                # If there are less than 3 lines
-        for contour in final_contours:                                                                                    # Iterate over all contours
-            #line_point = cv.approxPolyDP(contour, 3, False)                                                         # Approximate contour
-            line_point = np.squeeze(contour)                                                                     # Remove single dimension
+        for contour in final_contours:                                                                              # Iterate over all contours
+            #line_point = cv.approxPolyDP(contour, 3, False)                                                        # Approximate contour
+            line_point = np.squeeze(contour)                                                                        # Remove single dimension
             line_point = list(line_point)                                                                           # Convert to list
             line_point.sort(key=lambda x: x[0])                                                                     # Sort points by x value
             if(len(line_point) > 2):                                                                                # If there are more than 2 points
@@ -211,11 +221,181 @@ n_lines = 0                                                                 # Nu
 angle = 0                                                                   # Angle of car
 m = 0                                                                       # Slope of line
 c = 0                                                                       # Y-intercept of line
+#n_array = np.array([0.05, 0.1, 0.15, 0.20, 0.5])                            # Array of weights for mean filter
 n_array = np.array([0.05, 0.1, 0.15, 0.20, 0.5])
 u_array =  np.array([0,0,0,0,0], dtype=float)                               # Array of control values
 Kp = 0.20                                                                   # Proportional gain
 u = 0                                                                       # Control signal
 contours = []                                                               # Contours
 u_inc = 7                                                                   # Increment of control value
+u_k = 0                                                                     # Control value
+u_sum = (1 / Kp)                                                            # Sum of control values """
+
+from ctypes.wintypes import HWINSTA
+import cv2 as cv
+import numpy as np
+from utils import *
+
+WIDTH = 640
+HEIGHT = 480
+CENTER_COORD = (WIDTH//2,HEIGHT-1)
+font = cv.FONT_HERSHEY_COMPLEX
+ 
+def imgProcess(img):
+    img = cv.resize(img, (WIDTH,HEIGHT))                                                                # Resize image
+    img = cv.cvtColor(img,cv.COLOR_RGB2GRAY)                                                            # Convert to grayscale
+    img = cv.blur(img,(5,5))                                                                            # Blur image to remove noise
+    _,img = cv.threshold(img,170,255,cv.THRESH_BINARY)                                                  # Threshold image
+    img = cv.morphologyEx(img,cv.MORPH_BLACKHAT,(5,5))                                                  # Apply blackhat filter
+    img = cv.morphologyEx(img,cv.MORPH_DILATE,(10,10))                                                  # Apply open filter
+    horizontal_kernel = cv.getStructuringElement(cv.MORPH_RECT, (30,1))                                 # Create horizontal kernel
+    horizontal_lines = cv.morphologyEx(img, cv.MORPH_CLOSE, horizontal_kernel, iterations=1)            # Apply horizontal filter in order to remove horizontal lines
+    img = img - horizontal_lines                                                                        # Subtract horizontal lines from original image, leaving only the vertical and diagonal lines
+    return img                                                                                          # Return image
+
+def drawVirtualCircles(img, center, start_radius, end_radius, thick):
+    for i in range (start_radius,end_radius+1,10):
+        cv.ellipse(img,center,(i,i),0,15,165, color = 255, thickness= thick)
+    return img
+
+def trendLine(points):
+    x = [i[0] for i in points]                                  # Create x array
+    y = [i[1] for i in points]                                  # Create y array
+    A = np.vstack([x, np.ones(len(x))]).T                       # Create A matrix
+    m, c = np.linalg.lstsq(A, y,rcond=None)[0]                  # Solve for m and c
+    return m,c                                                  # Return the slope (m) and y-intercept (c)
+
+def drawTrendLine(slope, b, img,color):
+    for i in range(0,WIDTH):                                    # Iterate over all x pixels in image
+        y = slope * i + b                                       # Calculate y value for each x
+        cv.line(img,(i,int(y)),(i,int(y)),color,1)              # Draw the corresponding line
+
+def MeanFilter(u):                                            
+    global n_array  
+    global u_array 
+    u_array = np.roll(u_array, -1, axis=0)                      # Roll array to the left
+    u_array[4] = u                                              # Insert new value in array
+    u_array = np.multiply(u_array, n_array)                     # Multiply array by n_array
+    u_mean = np.sum(u_array)                                    # Sum array
+    return u_mean                                               # Return mean value
+
+def PIcontrol(u):
+    global error_sum
+    u = MeanFilter(u)   
+    error = 0 - u
+    error_sum = error_sum + error*Ki                                                                 
+    u = error*Kp + error_sum                                   
+    if (u > 45):                              
+        u = 45                                   
+    elif (u < -45):                               
+        u = -45                                                                     
+    return u                                      
+
+def separateArrayByRegion(points):
+    final_points = []
+    in_region = False
+    if(len(points) == 0 or len(points) > 300):
+        return final_points
+    points.sort(key=lambda x: x[0])
+    final_points.append([points[0]])
+    for point in points:
+        for region in final_points:
+            for point_in_region in region:
+                if euclideanDistance(point,point_in_region) < 200:
+                    region.append(point)
+                    in_region = True
+                    break
+        if in_region == False:
+            final_points.append([point])
+        in_region = False
+
+    return final_points
+       
+def detectLines(frame,cross_flag):
+    global n_lines
+
+    imgA = imgProcess(frame)                                                                
+    imgB = np.zeros((HEIGHT,WIDTH),dtype=np.uint8)
+
+    if(cross_flag == False):
+        drawVirtualCircles(imgB, (WIDTH//2,int(HEIGHT//2)), 70, 450, 2)  
+    else:
+        drawVirtualCircles(imgB, (int(WIDTH//2),int(HEIGHT//3.3)), 30, 450, 2)                  
+    imgC = cv.bitwise_and(imgA, imgB)                                                 
+    imgC,points = pointSelectionFilter(imgC,(1,1))
+    final_contours = separateArrayByRegion(points)
+
+    n_lines = len(final_contours)
+    return imgC, n_lines, final_contours                                                                         
+
+def trendLineAlgorithm(frame, priority, n_lines):
+    global u_k  
+    global u_sum
+    global u_inc
+    global u   
+    
+    img,n_lines, final_contours = detectLines(frame,False)
+    line_points = []                                                                                              
+
+    if(n_lines > 0 and n_lines < 3):                                                                                
+        for line_point in final_contours:                                                                                                                                                                                                                             
+            line_point.sort(key=lambda x: x[0])                                                                    
+            if(len(line_point) > 2):                                                                               
+                m,c = trendLine(line_point)            
+                drawTrendLine(m,c,img,255)                                                             
+                line_points.append([line_point[0][0],line_point[0][1],line_point[-1][0],line_point[-1][1], m, c])
+        cv.imshow("img",img)
+        if (len(line_points) == 0):
+            return 0
+        if (len(line_points) == 1):   
+            if ((priority == PRIORITY_LEFT or priority == PRIORITY_AHEAD) and line_points[0][0] < WIDTH//2):       
+                top = (97 - line_points[0][5])/line_points[0][4] - WIDTH//2     
+                bottom = (HEIGHT - line_points[0][5])/line_points[0][4] 
+                u = top*0.6+bottom*0.4
+                u_k = 0                                                                                             
+            elif (priority == PRIORITY_RIGHT and line_points[0][3] > WIDTH//2):                                     
+                top = (97 - line_points[0][5])/line_points[0][4] - WIDTH//2  
+                bottom = (HEIGHT - line_points[0][5])/line_points[0][4] - WIDTH 
+                u = top*0.6+bottom*0.4                                                             
+                u_k = 0                                                                                             
+            else:                                                                                                   
+                if (priority == PRIORITY_LEFT or priority == PRIORITY_AHEAD):                                       
+                    u_k = u_k - u_inc                                                                              
+                    u = u_k * u_sum                                                                                 
+                else:                                                                                               
+                    u_k = u_k + u_inc                                                                               
+                    u = u_k * u_sum                                                                                 
+        else:                                                                                                       
+            u = ((97 - line_points[0][5])/line_points[0][4])
+            u2 = ((97 - line_points[1][5])/line_points[1][4])
+            if ((u < WIDTH and u > 0 and u2 < WIDTH and u2 > 0) or ((u > WIDTH or u < 0) and (u2 > WIDTH or u2 < 0))):
+                u = u - WIDTH//2
+                u2 = u2 - WIDTH//2
+                u = u*0.5+u2*0.5
+            else:
+                u = 0                                                                                               
+            u_k = 0                                                                                                 
+        
+        u = PIcontrol(u)
+        return u                                                                                                   
+    return 0                                                                                                       
+
+# Variables
+PRIORITY_AHEAD = 0  
+PRIORITY_RIGHT = 1
+PRIORITY_LEFT = 2
+
+n_lines = 0                                                                 # Number of lines detected
+angle = 0                                                                   # Angle of car
+m = 0                                                                       # Slope of line
+c = 0                                                                       # Y-intercept of line
+n_array = np.array([0.075, 0.075, 0.10, 0.25, 0.5])                         # Array of weights for mean filter
+u_array =  np.array([0,0,0,0,0], dtype=float)                               # Array of control values
+Kp = 0.2                                                                    # Proportional gain
+Ki = 0.0                                                                    # Integral gain
+error_sum = 0                                                               # Error sum
+u = 0                                                                       # Control signal
+contours = []                                                               # Contours
+u_inc = 20                                                                  # Increment of control value
 u_k = 0                                                                     # Control value
 u_sum = (1 / Kp)                                                            # Sum of control values
