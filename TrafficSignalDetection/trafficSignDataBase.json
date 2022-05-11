@@ -1,0 +1,184 @@
+[
+    {
+        "CrossWalkSignal":
+        {
+            "shape": "SQUARE",
+            "colors": ["BLUE","WHITE","BLACK"],
+            "quadrants":
+            {
+                "1": [["BLUE", 0.763], ["WHITE", 0.174], ["UNKNOWN", 0.0322], ["BLACK", 0.0308]],
+                "2": [["BLUE", 0.4831526], ["WHITE", 0.3576348], ["BLACK", 0.11240616], ["UNKNOWN", 0.04700644]],
+                "3": [["BLUE", 0.748], ["WHITE", 0.1848], ["UNKNOWN", 0.037], ["BLACK", 0.0302]],
+                "4": [["BLUE", 0.4979496], ["WHITE", 0.35723696], ["BLACK", 0.09840604000000001], ["UNKNOWN", 0.0466074]]
+            }
+        }
+    },
+    {
+        "ParkingForbidenSignal":
+        {
+            "shape": "CIRCLE",
+            "colors": ["RED","BLUE","WHITE"],
+            "quadrants":
+            {
+                "1": [["UNKNOWN", 0.3572], ["RED", 0.2918], ["BLUE", 0.2712], ["WHITE", 0.0706]],
+                "2": [["UNKNOWN", 0.34887144], ["RED", 0.29885836], ["BLUE", 0.27085424], ["WHITE", 0.07161412]],
+                "3": [["UNKNOWN", 0.3472], ["RED", 0.2968], ["BLUE", 0.283], ["WHITE", 0.0638]],
+                "4": [["UNKNOWN", 0.32886944], ["RED", 0.29545936], ["BLUE", 0.2916566], ["WHITE", 0.07521276]]
+            }
+        }
+    },
+    {
+        "RoadBendRightSignal":
+        {
+            "shape": "TRIANGLE",
+            "colors": ["RED","WHITE","BLACK"],
+            "quadrants":
+            {
+                "1": [["UNKNOWN", 0.6762], ["WHITE", 0.1718], ["RED", 0.1364], ["BLACK", 0.0156]],
+                "2": [["WHITE", 0.37923436], ["RED", 0.27162727999999997], ["UNKNOWN", 0.21253524], ["BLACK", 0.13680312]],
+                "3": [["UNKNOWN", 0.6654], ["WHITE", 0.1674], ["RED", 0.1348], ["BLACK", 0.0324]],
+                "4": [["WHITE", 0.5026334800000001], ["RED", 0.26462696], ["UNKNOWN", 0.20753307999999998], ["BLACK", 0.02540648]]
+            }
+        }
+    },
+    {
+        "ParkSignal":
+        {
+            "shape": "SQUARE",
+            "colors": ["BLUE","WHITE"],
+            "quadrants":
+            {
+                "1": [["BLUE", 0.641], ["WHITE", 0.3118], ["UNKNOWN", 0.0312]],
+                "2": [["BLUE", 0.6363282], ["WHITE", 0.32106236], ["UNKNOWN", 0.027606240000000004]],
+                "3": [["BLUE", 0.618], ["WHITE", 0.3222], ["UNKNOWN", 0.044]],
+                "4": [["BLUE", 0.7841236], ["WHITE", 0.17386444], ["UNKNOWN", 0.028408799999999998]]
+            }
+        }
+    },
+    {
+        "PrioritySignal":
+        {
+            "shape": "SQUARE",
+            "colors": ["RED", "BLUE", "WHITE"],
+            "quadrants":
+            {
+                "1": [["BLUE", 0.7342], ["WHITE", 0.0932], ["RED", 0.081], ["UNKNOWN", 0.077]],
+                "2": [["BLUE", 0.7263468399999999], ["UNKNOWN", 0.0906154], ["WHITE", 0.08581864], ["RED", 0.0828162]],
+                "3": [["BLUE", 0.7486], ["WHITE", 0.1936], ["UNKNOWN", 0.04]],
+                "4": [["BLUE", 0.75774972], ["WHITE", 0.18603872000000002], ["UNKNOWN", 0.040408]]
+            }
+        }
+    },
+    {
+        "RoadBendAheadSignal":
+        {
+            "shape": "SQUARE",
+            "colors": ["WHITE", "BLACK"],
+            "quadrants":
+            {
+                "1": [["WHITE", 0.854], ["BLACK", 0.1174], ["UNKNOWN", 0.0286]],
+                "2": [["WHITE", 0.8235708], ["BLACK", 0.15202348], ["UNKNOWN", 0.02460572]],
+                "3": [["WHITE", 0.812], ["BLACK", 0.1664], ["UNKNOWN", 0.0216]],
+                "4": [["WHITE", 0.9537624], ["BLACK", 0.031233280000000002], ["UNKNOWN", 0.015204320000000002]]
+            }
+        }
+    },
+    {
+        "SpeedLimitSignal":
+        {
+            "shape": "CIRCLE",
+            "colors": ["RED", "WHITE", "BLACK"],
+            "quadrants":
+            {
+                "1": [["WHITE", 0.4054], ["UNKNOWN", 0.2838], ["RED", 0.2156], ["BLACK", 0.0952]],
+                "2": [["WHITE", 0.36788108], ["UNKNOWN", 0.26885676], ["RED", 0.23324312], ["BLACK", 0.13021904]],
+                "3": [["WHITE", 0.3858], ["UNKNOWN", 0.251], ["RED", 0.2498], ["BLACK", 0.1134]],
+                "4": [["WHITE", 0.38867716], ["UNKNOWN", 0.2564502], ["RED", 0.23624996], ["BLACK", 0.11882267999999999]]
+            }
+        }
+    },
+    {
+        "EntryNotAllowedSignal":
+        {
+            "shape": "CIRCLE",
+            "colors": ["RED", "WHITE"],
+            "quadrants":
+            {
+                "1": [["WHITE", 0.4742], ["UNKNOWN", 0.2654], ["RED", 0.252]],
+                "2": [["WHITE", 0.49109484000000003], ["UNKNOWN", 0.25765308], ["RED", 0.2412504]],
+                "3": [["WHITE", 0.489], ["UNKNOWN", 0.2614], ["RED", 0.2382]],
+                "4": [["WHITE", 0.4796978], ["UNKNOWN", 0.26125227999999995], ["RED", 0.24784764]]
+            }
+        }
+    },
+    {
+        "MandatoryLeftSignal":
+        {
+            "shape": "CIRCLE",
+            "colors": ["BLUE", "WHITE"],
+            "quadrants":
+            {
+                "1": [["BLUE", 0.5168], ["UNKNOWN", 0.271], ["WHITE", 0.204]],
+                "2": [["BLUE", 0.5511033599999999], ["UNKNOWN", 0.23965419999999998], ["WHITE", 0.2040408]],
+                "3": [["BLUE", 0.595], ["UNKNOWN", 0.2382], ["WHITE", 0.1608]],
+                "4": [["BLUE", 0.594519], ["UNKNOWN", 0.24924764], ["WHITE", 0.14803216]]
+            }
+        }
+    },
+    {
+        "MandatorylightSignal":
+        {
+            "shape": "CIRCLE",
+            "colors": ["BLUE", "WHITE"],
+            "quadrants":
+            {
+                "1": [["BLUE", 0.5576], ["UNKNOWN", 0.262], ["WHITE", 0.1738]],
+                "2": [["BLUE", 0.51671152], ["UNKNOWN", 0.2706524], ["WHITE", 0.20603476]],
+                "3": [["WHITE", 0.399], ["BLUE", 0.3418], ["UNKNOWN", 0.2512]],
+                "4": [["BLUE", 0.57046836], ["UNKNOWN", 0.24285024], ["WHITE", 0.1818798]]
+            }
+        }
+    },
+    {
+        "RoadWorkSignal":
+        {
+            "shape": "TRIANGLE",
+            "colors": ["RED", "YELLOW", "BLACK"],
+            "quadrants":
+            {
+                "1": [["UNKNOWN", 0.6726], ["RED", 0.1778], ["YELLOW", 0.1176], ["BLACK", 0.032]],
+                "2": [["RED", 0.33603556], ["YELLOW", 0.29442352], ["UNKNOWN", 0.20393452], ["BLACK", 0.1658064]],
+                "3": [["UNKNOWN", 0.6664], ["RED", 0.19], ["YELLOW", 0.112], ["BLACK", 0.0316]],
+                "4": [["YELLOW", 0.3470224], ["RED", 0.343438], ["UNKNOWN", 0.18173328000000002], ["BLACK", 0.12800632]]
+            }
+        }
+    },
+    {
+        "SteppAheadSignal":
+        {
+            "shape": "TRIANGLE",
+            "colors": ["RED", "WHITE", "BLACK"],
+            "quadrants":
+            {
+                "1": [["UNKNOWN", 0.666], ["WHITE", 0.1838], ["RED", 0.145], ["BLACK", 0.0052]],
+                "2": [["WHITE", 0.28043676], ["RED", 0.263629], ["UNKNOWN", 0.2355332], ["BLACK", 0.22060104]],
+                "3": [["UNKNOWN", 0.6758], ["WHITE", 0.1804], ["RED", 0.1328], ["BLACK", 0.011]],
+                "4": [["BLACK", 0.3158022], ["RED", 0.26162655999999995], ["UNKNOWN", 0.21373516], ["WHITE", 0.20903607999999999]]
+            }
+        }
+    },
+    {
+        "TrafficLightAheadSignal":
+        {
+            "shape": "TRIANGLE",
+            "colors": ["RED", "GREEN", "YELLOW", "WHITE", "BLACK"],
+            "quadrants":
+            {
+                "1": [["UNKNOWN", 0.6882], ["RED", 0.152], ["WHITE", 0.1468], ["BLACK", 0.013]],
+                "2": [["WHITE", 0.43202936], ["RED", 0.2698304], ["UNKNOWN", 0.21733764], ["BLACK", 0.0394026], ["GREEN", 0.0214], ["YELLOW", 0.0202]],
+                "3": [["UNKNOWN", 0.6682], ["RED", 0.1654], ["WHITE", 0.1524], ["BLACK", 0.014]],
+                "4": [["WHITE", 0.40883048], ["RED", 0.27923307999999997], ["UNKNOWN", 0.21313364], ["BLACK", 0.0462028], ["YELLOW", 0.0272], ["GREEN", 0.0256]]
+            }
+        }
+    }
+]
